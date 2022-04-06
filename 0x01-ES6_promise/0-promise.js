@@ -1,5 +1,5 @@
-function getResponseFromAPI(){
- return promise((resolve) => {
+export function getResponseFromAPI(){
+ return new promise((resolve) => {
    resolve('msg');
  });
 }
