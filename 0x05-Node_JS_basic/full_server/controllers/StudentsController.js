@@ -1,33 +1,35 @@
 const readDatabase = require('../utils');
 
 class StudentsController {
-  static getAllStudents(request, response) {
-    readDatabase(process.argv[2].toString()).then((students) => {
-      const output = [];
-      output.push('This is the list of our students');
-      const keys = Object.keys(students);
-      keys.sort();
-      for (let i = 0; i < keys.length; i += 1) {
-        output.push(`Number of students in ${keys[i]}: ${students[keys[i]].length}. List: ${students[keys[i]].join(', ')}`);
-      }
-      response.status(200).send(output.join('\n'));
-    }).catch(() => {
-      response.status(500).send('Cannot load the database');
-    });
+  static getAllStudents(req, res) {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.write('This is the list of our students\n');
+    readDatabase('./database.csv').then((data) => {
+      res.write(`Number of students in CS: ${data.CS.length}. List: ${data.CS.join(', ')}\n`);
+      res.write(`Number of students in SWE: ${data.SWE.length}. List: ${data.SWE.join(', ')}\n`);
+      res.end();
+    }).catch((err) => res.write(err.message))
+      .finally(() => {
+        res.end();
+      });
   }
 
-  static getAllStudentsByMajor(request, response) {
-    const field = request.params.major;
-    readDatabase(process.argv[2].toString()).then((students) => {
-      if (!(field in students)) {
-        response.status(500).send('Major parameter must be CS or SWE');
-      } else {
-        response.status(200).send(`List: ${students[field].join(', ')}`);
-      }
-    }).catch(() => {
-      response.status(500).send('Cannot load the database');
-    });
+  static getAllStudentsByMajor(req, res) {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    const { major } = req.params;
+    if (major !== 'CS' && major !== 'SWE') {
+      res.statusCode = 500;
+      res.write('Major parameter must be CS or SWE\n');
+      res.end();
+      return;
+    }
+    readDatabase('./database.csv').then((data) => {
+      res.write(`List: ${data.major.join(', ')}\n`);
+      res.end();
+    }).catch((err) => res.send(err.message));
   }
 }
 
-module.exports = StudentsController;
+export default StudentsController;
