@@ -24,4 +24,4 @@ module.exports = function readDatabase(filePath) {
     });
   });
 };
-© 2022 GitHub, Inc
+
