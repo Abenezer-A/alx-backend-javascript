@@ -1,3 +1,2 @@
-
-func displayMessage(txt):
-   console.log(txt)
+const displayMessage = (text) => console.log(text):
+module.exports = displayMessage;
